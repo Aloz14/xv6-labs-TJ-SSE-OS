@@ -1,8 +1,12 @@
 
 xv6 kernel is booting
 
-hart 1 starting
 hart 2 starting
+hart 1 starting
 init: starting sh
-$ sleep 10
-qemu-system-riscv64: terminating on signal 15 from pid 4652 (make)
+$ pingpong
+4: received ping
+3: received pong
+$ echo OK
+OK
+$ qemu-system-riscv64: terminating on signal 15 from pid 3833 (make)
