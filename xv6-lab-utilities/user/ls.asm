@@ -5,11 +5,11 @@ user/_ls：     文件格式 elf64-littleriscv
 Disassembly of section .text:
 
 0000000000000000 <fmtname>:
+#include "kernel/stat.h"
 #include "user/user.h"
 #include "kernel/fs.h"
 
-char*
-fmtname(char *path)
+char *fmtname(char *path)
 {
    0:	7179                	addi	sp,sp,-48
    2:	f406                	sd	ra,40(sp)
@@ -19,11 +19,11 @@ fmtname(char *path)
    a:	e44e                	sd	s3,8(sp)
    c:	1800                	addi	s0,sp,48
    e:	84aa                	mv	s1,a0
-  static char buf[DIRSIZ+1];
-  char *p;
+    static char buf[DIRSIZ + 1];
+    char *p;
 
-  // Find first character after last slash.
-  for(p=path+strlen(path); p >= path && *p != '/'; p--)
+    // Find first character after last slash.
+    for (p = path + strlen(path); p >= path && *p != '/'; p--)
   10:	00000097          	auipc	ra,0x0
   14:	328080e7          	jalr	808(ra) # 338 <strlen>
   18:	02051793          	slli	a5,a0,0x20
@@ -35,22 +35,22 @@ fmtname(char *path)
   2c:	00d70563          	beq	a4,a3,36 <fmtname+0x36>
   30:	17fd                	addi	a5,a5,-1
   32:	fe97fbe3          	bgeu	a5,s1,28 <fmtname+0x28>
-    ;
-  p++;
+        ;
+    p++;
   36:	00178493          	addi	s1,a5,1
 
-  // Return blank-padded name.
-  if(strlen(p) >= DIRSIZ)
+    // Return blank-padded name.
+    if (strlen(p) >= DIRSIZ)
   3a:	8526                	mv	a0,s1
   3c:	00000097          	auipc	ra,0x0
   40:	2fc080e7          	jalr	764(ra) # 338 <strlen>
   44:	2501                	sext.w	a0,a0
   46:	47b5                	li	a5,13
   48:	00a7fa63          	bgeu	a5,a0,5c <fmtname+0x5c>
-    return p;
-  memmove(buf, p, strlen(p));
-  memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
-  return buf;
+        return p;
+    memmove(buf, p, strlen(p));
+    memset(buf + strlen(p), ' ', DIRSIZ - strlen(p));
+    return buf;
 }
   4c:	8526                	mv	a0,s1
   4e:	70a2                	ld	ra,40(sp)
@@ -60,7 +60,7 @@ fmtname(char *path)
   56:	69a2                	ld	s3,8(sp)
   58:	6145                	addi	sp,sp,48
   5a:	8082                	ret
-  memmove(buf, p, strlen(p));
+    memmove(buf, p, strlen(p));
   5c:	8526                	mv	a0,s1
   5e:	00000097          	auipc	ra,0x0
   62:	2da080e7          	jalr	730(ra) # 338 <strlen>
@@ -71,7 +71,7 @@ fmtname(char *path)
   74:	854e                	mv	a0,s3
   76:	00000097          	auipc	ra,0x0
   7a:	434080e7          	jalr	1076(ra) # 4aa <memmove>
-  memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
+    memset(buf + strlen(p), ' ', DIRSIZ - strlen(p));
   7e:	8526                	mv	a0,s1
   80:	00000097          	auipc	ra,0x0
   84:	2b8080e7          	jalr	696(ra) # 338 <strlen>
@@ -87,14 +87,13 @@ fmtname(char *path)
   a4:	01298533          	add	a0,s3,s2
   a8:	00000097          	auipc	ra,0x0
   ac:	2ba080e7          	jalr	698(ra) # 362 <memset>
-  return buf;
+    return buf;
   b0:	84ce                	mv	s1,s3
   b2:	bf69                	j	4c <fmtname+0x4c>
 
 00000000000000b4 <ls>:
 
-void
-ls(char *path)
+void ls(char *path)
 {
   b4:	d9010113          	addi	sp,sp,-624
   b8:	26113423          	sd	ra,616(sp)
@@ -106,32 +105,32 @@ ls(char *path)
   d0:	23513c23          	sd	s5,568(sp)
   d4:	1c80                	addi	s0,sp,624
   d6:	892a                	mv	s2,a0
-  char buf[512], *p;
-  int fd;
-  struct dirent de;
-  struct stat st;
+    char buf[512], *p;
+    int fd;
+    struct dirent de;
+    struct stat st;
 
-  if((fd = open(path, 0)) < 0){
+    if ((fd = open(path, 0)) < 0) {
   d8:	4581                	li	a1,0
   da:	00000097          	auipc	ra,0x0
   de:	4c2080e7          	jalr	1218(ra) # 59c <open>
   e2:	08054163          	bltz	a0,164 <ls+0xb0>
   e6:	84aa                	mv	s1,a0
-    fprintf(2, "ls: cannot open %s\n", path);
-    return;
-  }
+        fprintf(2, "ls: cannot open %s\n", path);
+        return;
+    }
 
-  if(fstat(fd, &st) < 0){
+    if (fstat(fd, &st) < 0) {
   e8:	d9840593          	addi	a1,s0,-616
   ec:	00000097          	auipc	ra,0x0
   f0:	4c8080e7          	jalr	1224(ra) # 5b4 <fstat>
   f4:	08054363          	bltz	a0,17a <ls+0xc6>
-    fprintf(2, "ls: cannot stat %s\n", path);
-    close(fd);
-    return;
-  }
+        fprintf(2, "ls: cannot stat %s\n", path);
+        close(fd);
+        return;
+    }
 
-  switch(st.type){
+    switch (st.type) {
   f8:	da041783          	lh	a5,-608(s0)
   fc:	0007869b          	sext.w	a3,a5
  100:	4705                	li	a4,1
@@ -140,9 +139,9 @@ ls(char *path)
  108:	17c2                	slli	a5,a5,0x30
  10a:	93c1                	srli	a5,a5,0x30
  10c:	02f76663          	bltu	a4,a5,138 <ls+0x84>
-  case T_DEVICE:
-  case T_FILE:
-    printf("%s %d %d %l\n", fmtname(path), st.type, st.ino, st.size);
+    case T_DEVICE:
+    case T_FILE:
+        printf("%s %d %d %l\n", fmtname(path), st.type, st.ino, st.size);
  110:	854a                	mv	a0,s2
  112:	00000097          	auipc	ra,0x0
  116:	eee080e7          	jalr	-274(ra) # 0 <fmtname>
@@ -154,12 +153,12 @@ ls(char *path)
  12c:	98850513          	addi	a0,a0,-1656 # ab0 <malloc+0x122>
  130:	00000097          	auipc	ra,0x0
  134:	7a6080e7          	jalr	1958(ra) # 8d6 <printf>
-      }
-      printf("%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+            }
+            printf("%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+        }
+        break;
     }
-    break;
-  }
-  close(fd);
+    close(fd);
  138:	8526                	mv	a0,s1
  13a:	00000097          	auipc	ra,0x0
  13e:	44a080e7          	jalr	1098(ra) # 584 <close>
@@ -173,48 +172,48 @@ ls(char *path)
  15a:	23813a83          	ld	s5,568(sp)
  15e:	27010113          	addi	sp,sp,624
  162:	8082                	ret
-    fprintf(2, "ls: cannot open %s\n", path);
+        fprintf(2, "ls: cannot open %s\n", path);
  164:	864a                	mv	a2,s2
  166:	00001597          	auipc	a1,0x1
  16a:	91a58593          	addi	a1,a1,-1766 # a80 <malloc+0xf2>
  16e:	4509                	li	a0,2
  170:	00000097          	auipc	ra,0x0
  174:	738080e7          	jalr	1848(ra) # 8a8 <fprintf>
-    return;
+        return;
  178:	b7e9                	j	142 <ls+0x8e>
-    fprintf(2, "ls: cannot stat %s\n", path);
+        fprintf(2, "ls: cannot stat %s\n", path);
  17a:	864a                	mv	a2,s2
  17c:	00001597          	auipc	a1,0x1
  180:	91c58593          	addi	a1,a1,-1764 # a98 <malloc+0x10a>
  184:	4509                	li	a0,2
  186:	00000097          	auipc	ra,0x0
  18a:	722080e7          	jalr	1826(ra) # 8a8 <fprintf>
-    close(fd);
+        close(fd);
  18e:	8526                	mv	a0,s1
  190:	00000097          	auipc	ra,0x0
  194:	3f4080e7          	jalr	1012(ra) # 584 <close>
-    return;
+        return;
  198:	b76d                	j	142 <ls+0x8e>
-    if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
+        if (strlen(path) + 1 + DIRSIZ + 1 > sizeof buf) {
  19a:	854a                	mv	a0,s2
  19c:	00000097          	auipc	ra,0x0
  1a0:	19c080e7          	jalr	412(ra) # 338 <strlen>
  1a4:	2541                	addiw	a0,a0,16
  1a6:	20000793          	li	a5,512
  1aa:	00a7fb63          	bgeu	a5,a0,1c0 <ls+0x10c>
-      printf("ls: path too long\n");
+            printf("ls: path too long\n");
  1ae:	00001517          	auipc	a0,0x1
  1b2:	91250513          	addi	a0,a0,-1774 # ac0 <malloc+0x132>
  1b6:	00000097          	auipc	ra,0x0
  1ba:	720080e7          	jalr	1824(ra) # 8d6 <printf>
-      break;
+            break;
  1be:	bfad                	j	138 <ls+0x84>
-    strcpy(buf, path);
+        strcpy(buf, path);
  1c0:	85ca                	mv	a1,s2
  1c2:	dc040513          	addi	a0,s0,-576
  1c6:	00000097          	auipc	ra,0x0
  1ca:	12a080e7          	jalr	298(ra) # 2f0 <strcpy>
-    p = buf+strlen(buf);
+        p = buf + strlen(buf);
  1ce:	dc040513          	addi	a0,s0,-576
  1d2:	00000097          	auipc	ra,0x0
  1d6:	166080e7          	jalr	358(ra) # 338 <strlen>
@@ -222,24 +221,24 @@ ls(char *path)
  1dc:	9101                	srli	a0,a0,0x20
  1de:	dc040793          	addi	a5,s0,-576
  1e2:	00a78933          	add	s2,a5,a0
-    *p++ = '/';
+        *p++ = '/';
  1e6:	00190993          	addi	s3,s2,1
  1ea:	02f00793          	li	a5,47
  1ee:	00f90023          	sb	a5,0(s2)
-      printf("%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+            printf("%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
  1f2:	00001a17          	auipc	s4,0x1
  1f6:	8e6a0a13          	addi	s4,s4,-1818 # ad8 <malloc+0x14a>
-        printf("ls: cannot stat %s\n", buf);
+                printf("ls: cannot stat %s\n", buf);
  1fa:	00001a97          	auipc	s5,0x1
  1fe:	89ea8a93          	addi	s5,s5,-1890 # a98 <malloc+0x10a>
-    while(read(fd, &de, sizeof(de)) == sizeof(de)){
+        while (read(fd, &de, sizeof(de)) == sizeof(de)) {
  202:	a801                	j	212 <ls+0x15e>
-        printf("ls: cannot stat %s\n", buf);
+                printf("ls: cannot stat %s\n", buf);
  204:	dc040593          	addi	a1,s0,-576
  208:	8556                	mv	a0,s5
  20a:	00000097          	auipc	ra,0x0
  20e:	6cc080e7          	jalr	1740(ra) # 8d6 <printf>
-    while(read(fd, &de, sizeof(de)) == sizeof(de)){
+        while (read(fd, &de, sizeof(de)) == sizeof(de)) {
  212:	4641                	li	a2,16
  214:	db040593          	addi	a1,s0,-592
  218:	8526                	mv	a0,s1
@@ -247,24 +246,24 @@ ls(char *path)
  21e:	35a080e7          	jalr	858(ra) # 574 <read>
  222:	47c1                	li	a5,16
  224:	f0f51ae3          	bne	a0,a5,138 <ls+0x84>
-      if(de.inum == 0)
+            if (de.inum == 0)
  228:	db045783          	lhu	a5,-592(s0)
  22c:	d3fd                	beqz	a5,212 <ls+0x15e>
-      memmove(p, de.name, DIRSIZ);
+            memmove(p, de.name, DIRSIZ);
  22e:	4639                	li	a2,14
  230:	db240593          	addi	a1,s0,-590
  234:	854e                	mv	a0,s3
  236:	00000097          	auipc	ra,0x0
  23a:	274080e7          	jalr	628(ra) # 4aa <memmove>
-      p[DIRSIZ] = 0;
+            p[DIRSIZ] = 0;
  23e:	000907a3          	sb	zero,15(s2)
-      if(stat(buf, &st) < 0){
+            if (stat(buf, &st) < 0) {
  242:	d9840593          	addi	a1,s0,-616
  246:	dc040513          	addi	a0,s0,-576
  24a:	00000097          	auipc	ra,0x0
  24e:	1d2080e7          	jalr	466(ra) # 41c <stat>
  252:	fa0549e3          	bltz	a0,204 <ls+0x150>
-      printf("%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+            printf("%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
  256:	dc040513          	addi	a0,s0,-576
  25a:	00000097          	auipc	ra,0x0
  25e:	da6080e7          	jalr	-602(ra) # 0 <fmtname>
@@ -279,8 +278,7 @@ ls(char *path)
 
 000000000000027c <main>:
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
  27c:	1101                	addi	sp,sp,-32
  27e:	ec06                	sd	ra,24(sp)
@@ -288,9 +286,9 @@ main(int argc, char *argv[])
  282:	e426                	sd	s1,8(sp)
  284:	e04a                	sd	s2,0(sp)
  286:	1000                	addi	s0,sp,32
-  int i;
+    int i;
 
-  if(argc < 2){
+    if (argc < 2) {
  288:	4785                	li	a5,1
  28a:	02a7d963          	bge	a5,a0,2bc <main+0x40>
  28e:	00858493          	addi	s1,a1,8
@@ -299,27 +297,27 @@ main(int argc, char *argv[])
  29a:	01d7d913          	srli	s2,a5,0x1d
  29e:	05c1                	addi	a1,a1,16
  2a0:	992e                	add	s2,s2,a1
-    ls(".");
-    exit(0);
-  }
-  for(i=1; i<argc; i++)
-    ls(argv[i]);
+        ls(".");
+        exit(0);
+    }
+    for (i = 1; i < argc; i++)
+        ls(argv[i]);
  2a2:	6088                	ld	a0,0(s1)
  2a4:	00000097          	auipc	ra,0x0
  2a8:	e10080e7          	jalr	-496(ra) # b4 <ls>
-  for(i=1; i<argc; i++)
+    for (i = 1; i < argc; i++)
  2ac:	04a1                	addi	s1,s1,8
  2ae:	ff249ae3          	bne	s1,s2,2a2 <main+0x26>
-  exit(0);
+    exit(0);
  2b2:	4501                	li	a0,0
  2b4:	00000097          	auipc	ra,0x0
  2b8:	2a8080e7          	jalr	680(ra) # 55c <exit>
-    ls(".");
+        ls(".");
  2bc:	00001517          	auipc	a0,0x1
  2c0:	82c50513          	addi	a0,a0,-2004 # ae8 <malloc+0x15a>
  2c4:	00000097          	auipc	ra,0x0
  2c8:	df0080e7          	jalr	-528(ra) # b4 <ls>
-    exit(0);
+        exit(0);
  2cc:	4501                	li	a0,0
  2ce:	00000097          	auipc	ra,0x0
  2d2:	28e080e7          	jalr	654(ra) # 55c <exit>
