@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     if (argc > 1) {
    8:	4785                	li	a5,1
    a:	02a7d063          	bge	a5,a0,2a <main+0x2a>
-        fprintf(2, "Only 1 argument is needed!\n");
+        fprintf(2, "No 1 argument is needed!\n");
    e:	00001597          	auipc	a1,0x1
   12:	9e258593          	addi	a1,a1,-1566 # 9f0 <malloc+0xe6>
   16:	4509                	li	a0,2
