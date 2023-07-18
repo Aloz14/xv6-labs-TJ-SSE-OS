@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 2) {
         fprintf(STOUT, "Usage: xargs <command> <args>\n");
-        exit(-1);
+        exit(1);
     }
 
     char *args[MAXARG];
@@ -40,22 +40,9 @@ int main(int argc, char *argv[])
         strcpy(args[arg_num], argv[i]);
         arg_num++;
     }
-    // 打印参数
-    fprintf(STOUT, "xargs in argv: ");
-    for (int i = 0; i < arg_num; i++) {
-        fprintf(STOUT, "%s ", args[i]);
-    }
-    fprintf(STOUT, "\n");
 
     while ((retval = read(STIN, &tmp, sizeof(tmp))) > 0 && arg_num < MAXARG) {
-        if (tmp == '\n') {
-            // 读取完毕
-            args[arg_num][arg_len] = '\0';
-            arg_len = 0;
-            arg_num++;
-            break;
-        }
-        else if (tmp == ' ') {
+        if (tmp == '\n' || tmp == ' ') {
             args[arg_num][arg_len] = '\0';
             arg_len = 0;
             arg_num++;
@@ -66,24 +53,11 @@ int main(int argc, char *argv[])
         }
     }
 
+    // 置NULL
     args[arg_num] = 0;
 
-    fprintf(STOUT, "xargs in all: ");
-    for (int i = 0; i < arg_num; i++) {
-        fprintf(STOUT, "%s ", args[i]);
-    }
-    fprintf(STOUT, "\n");
-
     if (fork() == 0) {
-        int val = exec("/echo", args);
-        if (val < 0) {
-            fprintf(STOUT, "exec failed\n");
-            exit(-1);
-        }
-        else {
-            fprintf(STOUT, "exec success\n");
-            fprintf(STOUT, "exec return value: %d\n", val);
-        }
+        exec(args[0], args);
         free_args(args, arg_num);
     }
     else {
