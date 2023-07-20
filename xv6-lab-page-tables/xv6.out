@@ -1,3 +1,4 @@
+*** Now run 'gdb' in another window.
 
 xv6 kernel is booting
 
@@ -16,6 +17,10 @@ page table 0x0000000087f6b000
 ......510: pte 0x0000000021fdd007 pa 0x0000000087f74000
 ......511: pte 0x0000000020001c0b pa 0x0000000080007000
 init: starting sh
-$ echo hi
-hi
-$ qemu-system-riscv64: terminating on signal 15 from pid 16779 (make)
+$ pgtbltest
+ugetpid_test starting
+ugetpid_test: OK
+pgaccess_test starting
+pgaccess_test: OK
+pgtbltest: all tests succeeded
+$ qemu-system-riscv64: terminating on signal 15 from pid 20514 (make)

@@ -3762,12 +3762,12 @@ outofinodes(char *s)
     exit(xstatus);
     23fe:	00003097          	auipc	ra,0x3
     2402:	7d8080e7          	jalr	2008(ra) # 5bd6 <exit>
+}
 
-static inline uint64
-r_sp()
+static inline uint64 r_sp()
 {
-  uint64 x;
-  asm volatile("mv %0, sp" : "=r" (x) );
+    uint64 x;
+    asm volatile("mv %0, sp" : "=r"(x));
     2406:	870a                	mv	a4,sp
     printf("%s: stacktest: read below stack %p\n", s, *sp);
     2408:	77fd                	lui	a5,0xfffff
