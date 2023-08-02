@@ -2,8 +2,8 @@
 
 xv6 kernel is booting
 
-hart 1 starting
 hart 2 starting
+hart 1 starting
 init: starting sh
 $ uthread
 thread_a started
@@ -313,4 +313,4 @@ thread_c: exit after 100
 thread_a: exit after 100
 thread_b: exit after 100
 thread_schedule: no runnable threads
-$ qemu-system-riscv64: terminating on signal 15 from pid 10312 (make)
+$ qemu-system-riscv64: terminating on signal 15 from pid 12858 (make)
